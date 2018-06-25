@@ -47,7 +47,7 @@ def preconditions(*preconditions):
     def decorator(function):
         def function_wrapper(*args):
             for i in range(len(preconditions)):
-            	if (preconditions[i] is not None) and (args[i] is not None):
+            	if (preconditions[i] is not None): #and (args[i] is not None):
             	    try:
             	    	assert preconditions[i](args[i])
             	    except AssertionError:

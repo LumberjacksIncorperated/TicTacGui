@@ -15,43 +15,50 @@ testFlag = None
 #------------------------------------------------------------------------------------------------------
 # IMPLEMENTATION
 #------------------------------------------------------------------------------------------------------
-class TicTacCanvas(tk.Canvas):
-    
-    #This number doesn't travel, we are going to have to make sure that it does
-    BOX_LENGTH = 60
-    
-    def _paint_board_for_marker_and_position(self, marker, xPosition, yPosition):
-        if marker == 0:
-            self.create_rectangle(xPosition*TicTacCanvas.BOX_LENGTH, yPosition*TicTacCanvas.BOX_LENGTH, xPosition*TicTacCanvas.BOX_LENGTH+TicTacCanvas.BOX_LENGTH, yPosition*TicTacCanvas.BOX_LENGTH+TicTacCanvas.BOX_LENGTH, fill="red")
-        if marker == 1:
-            self.create_rectangle(xPosition*TicTacCanvas.BOX_LENGTH, yPosition*TicTacCanvas.BOX_LENGTH, xPosition*TicTacCanvas.BOX_LENGTH+TicTacCanvas.BOX_LENGTH, yPosition*TicTacCanvas.BOX_LENGTH+TicTacCanvas.BOX_LENGTH, fill="blue")
-        if marker == 2:
-            self.create_rectangle(xPosition*TicTacCanvas.BOX_LENGTH, yPosition*TicTacCanvas.BOX_LENGTH, xPosition*TicTacCanvas.BOX_LENGTH+TicTacCanvas.BOX_LENGTH, yPosition*TicTacCanvas.BOX_LENGTH+TicTacCanvas.BOX_LENGTH, fill="white")
-    #END
+class UserMove:
 
-    def paint_game_board_to_screen(self):
-        self.delete("all")
-        for boardXPosition in range(Board.BOARD_SIZE):
-            for boardYPosition in range(Board.BOARD_SIZE):
-                currentBoardMarker = self._board.getMarkerAtBoardPosition(boardXPosition, boardYPosition)
-                self._paint_board_for_marker_and_position(currentBoardMarker, boardXPosition, boardYPosition)
-    #END
+    CONSTANT = 60
 
-    def __init__(self, parent, *args, **kwargs):
-        #--------------------------------
-        # Required by Tkinter
-        #--------------------------------
-        tk.Canvas.__init__(self, parent)
-        self.pack()
-        #--------------------------------
-        
-        self._board = Board()
-        self.paint_game_board_to_screen()
-    #END
+    @preconditions( (lambda self: True),
+                    (lambda boardXPosition: ((isinstance(boardXPosition, int))) and (boardXPosition >= 0) and (boardXPosition < 180)), 
+                    (lambda boardYPosition: ((isinstance(boardYPosition, int))) and (boardYPosition >= 0) and (boardYPosition < 180)) ) 
+    def __init__(self, xPosition, yPosition):
+        '''
+        DESCRIPTION:
+            Creates a user move that places a marker on the board for a given board when user move is executed
 
-    def getBoard(self):
-    	return self._board
-    #END
+        PARAMETERS:
+            xPosition: a board coordinate in the x direction between 0 and 180 as an integer
+            yPosition: a board coordinate in the y direction between 0 and 180 as an integer
+
+        RETURNS:
+            (valid arguement) 
+                The User Move Object
+            (invalid arguement)
+                a PreconditionError is thrown
+        '''
+        self._xPosition = xPosition / UserMove.CONSTANT
+        self._yPosition = yPosition / UserMove.CONSTANT
+	#END
+
+    @preconditions( (lambda self: True),
+                    (lambda board: (board is not None) ) ) 
+    def executeMoveOnBoard(self, board):
+        '''
+        DESCRIPTION:
+            Places a token at a given board position for a player token that is alternating for the given board
+
+        PARAMETERS:
+            board: The board the player marker will be placed on
+
+        RETURNS:
+            (valid arguement) 
+                None
+            (invalid arguement)
+                a PreconditionError is thrown
+        '''
+        board.placePlayerMarkerOnBoardAtPosition(self._xPosition, self._yPosition)
+	#END
 
 #------------------------------------------------------------------------------------------------------
 # TESTING IMPLEMENTATION
@@ -114,7 +121,7 @@ class TestConstructor(unittest.TestCase):
         for xPosition in range(180):
             for yPosition in ['asd', (), [], 1.2]:
             	self.assertRaises( PreconditionError, UserMove, (xPosition, yPosition))
-"""
+
 class TestExecuteMoveOnBoard(unittest.TestCase):
  
     #------------------------------------------------------------------------------------------------------
@@ -159,7 +166,7 @@ class TestExecuteMoveOnBoard(unittest.TestCase):
             	newUserMove = UserMove(xPosition, yPosition)
             	board = None
             	self.assertRaises(PreconditionError, newUserMove.executeMoveOnBoard, (board))
-"""
+
 #------------------------------------------------------------------------------------------------------
 # TESTING DRIVER
 #------------------------------------------------------------------------------------------------------
