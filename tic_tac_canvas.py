@@ -6,6 +6,7 @@ from conditions import preconditions, PreconditionError
 import sys
 import Tkinter as tk
 from tic_tac_board import Board
+import time
 
 #------------------------------------------------------------------------------------------------------
 # TEST FLAG
@@ -17,9 +18,12 @@ testFlag = None
 #------------------------------------------------------------------------------------------------------
 class TicTacCanvas(tk.Canvas):
     
-    #This number doesn't travel, we are going to have to make sure that it does
     BOX_LENGTH = 60
     
+    @preconditions( (lambda self: True),
+    				(lambda marker: ((isinstance(marker, int))) and (marker >= 0) and (marker < 3)),
+                    (lambda boardXPosition: ((isinstance(boardXPosition, int))) and (boardXPosition >= 0) and (boardXPosition < 3)), 
+                    (lambda boardYPosition: ((isinstance(boardYPosition, int))) and (boardYPosition >= 0) and (boardYPosition < 3)) ) 
     def _paint_board_for_marker_and_position(self, marker, xPosition, yPosition):
         if marker == 0:
             self.create_rectangle(xPosition*TicTacCanvas.BOX_LENGTH, yPosition*TicTacCanvas.BOX_LENGTH, xPosition*TicTacCanvas.BOX_LENGTH+TicTacCanvas.BOX_LENGTH, yPosition*TicTacCanvas.BOX_LENGTH+TicTacCanvas.BOX_LENGTH, fill="red")
@@ -30,6 +34,13 @@ class TicTacCanvas(tk.Canvas):
     #END
 
     def paint_game_board_to_screen(self):
+    	'''
+        DESCRIPTION:
+            Paints the current board to user screen
+
+        RETURNS:
+            None
+        '''
         self.delete("all")
         for boardXPosition in range(Board.BOARD_SIZE):
             for boardYPosition in range(Board.BOARD_SIZE):
@@ -50,7 +61,14 @@ class TicTacCanvas(tk.Canvas):
     #END
 
     def getBoard(self):
-    	return self._board
+        '''
+        DESCRIPTION:
+            Retrieves that game board that this canas will paint to the screen
+
+        RETURNS: 
+            The game board associated with this canvas
+        '''
+        return self._board
     #END
 
 #------------------------------------------------------------------------------------------------------
@@ -66,56 +84,39 @@ class TestConstructor(unittest.TestCase):
 
     def tearDown(self):
         pass
+
+    def _doneShowing(self):
+    	self._tk_root.destroy()
+    	self._tk_root.quit()
+
+    def _request_user_confirmation(self):
+        user_answer = raw_input("Enter <y> if Tic Tac board is completely red or <n> if it wasn't:\n")
+        if(user_answer == 'y'):
+            return
+        if(user_answer == 'n'):
+            raise Exception('Test Failed')
+        raise Exception('Incorrect user testing arguement: Test Discounted and Failed')
  
     #------------------------------------------------------------------------------------------------------
     # POSITIVE TESTING
     #------------------------------------------------------------------------------------------------------
-    def test_construction_for_corrext_x_position_value(self):
-        for xPosition in range(180):
-            for yPosition in range(180):
-            	newUserMove = UserMove(xPosition, yPosition)
-                self.assertEqual( newUserMove._xPosition, xPosition / 60 )
+    def test_construction(self):
+    	if not (testFlag == "-interactive"):
+            print("\n<Test function 'test_construction' is not run on this testing mode.>")
+            return
+        print(chr(27) + "[2J") # Just clears terminal screen
+        self._tk_root = tk.Tk()
+        self._tk_root.title("TEST")
+        self._tk_root.geometry("180x180")
+        self._canvas = TicTacCanvas(self._tk_root, width=180, height=180)
+        self._tk_root.after(3000, self._doneShowing)
+        self._tk_root.mainloop()
+        try:
+            self._request_user_confirmation()
+        except Exception:
+            raise Exception
 
-    def test_construction_for_corrext_y_position_value(self):
-        for xPosition in range(180):
-            for yPosition in range(180):
-            	newUserMove = UserMove(xPosition, yPosition)
-                self.assertEqual( newUserMove._yPosition, yPosition / 60 )
-
-    #------------------------------------------------------------------------------------------------------
-    # NEGATIVE TESTING
-    #------------------------------------------------------------------------------------------------------
-    def test_construction_for_x_position_value_too_high(self):
-        for xPosition in range(180,300):
-            for yPosition in range(180):
-                self.assertRaises( PreconditionError, UserMove, (xPosition, yPosition))
-
-    def test_construction_for_y_position_value_too_high(self):
-        for xPosition in range(180):
-            for yPosition in range(180,300):
-            	self.assertRaises( PreconditionError, UserMove, (xPosition, yPosition))
-
-    def test_construction_for_x_position_value_too_low(self):
-        for xPosition in range(-180,0):
-            for yPosition in range(180):
-                self.assertRaises( PreconditionError, UserMove, (xPosition, yPosition))
-
-    def test_construction_for_y_position_value_too_low(self):
-        for xPosition in range(180):
-            for yPosition in range(-180,0):
-            	self.assertRaises( PreconditionError, UserMove, (xPosition, yPosition))
-
-    def test_construction_for_x_position_invalid_type(self):
-        for xPosition in ['asd', (), [], 1.2]:
-            for yPosition in range(180):
-                self.assertRaises( PreconditionError, UserMove, (xPosition, yPosition))
-
-    def test_construction_for_y_position_value_invalid_type(self):
-        for xPosition in range(180):
-            for yPosition in ['asd', (), [], 1.2]:
-            	self.assertRaises( PreconditionError, UserMove, (xPosition, yPosition))
-"""
-class TestExecuteMoveOnBoard(unittest.TestCase):
+class TestPaintBoardForMarkerAndPosition(unittest.TestCase):
  
     #------------------------------------------------------------------------------------------------------
     # TESTING SUPPORT CODE
@@ -125,41 +126,247 @@ class TestExecuteMoveOnBoard(unittest.TestCase):
 
     def tearDown(self):
         pass
- 
+
+    def _doneShowing(self):
+    	self._tk_root.destroy()
+    	self._tk_root.quit()
+
+    def _request_user_confirmation(self):
+        user_answer = raw_input("Enter <y> if Tic Tac board is as described or <n> if it wasn't:\n")
+        if(user_answer == 'y'):
+            return
+        if(user_answer == 'n'):
+            raise Exception('Test Failed')
+        raise Exception('Incorrect user testing arguement: Test Discounted and Failed')
+
     #------------------------------------------------------------------------------------------------------
     # POSITIVE TESTING
     #------------------------------------------------------------------------------------------------------
-    def test_moves_for_player_one(self):
-        for xPosition in range(180):
-            for yPosition in range(180):
-            	self._board = Board()
-            	newUserMove = UserMove(xPosition, yPosition)
-            	newUserMove.executeMoveOnBoard(self._board)
-                self.assertEqual( self._board._boardGrid[xPosition/60][yPosition/60], 2 )
-                self._board = None
+    def test_paint_board_for_all_markers_and_positions_that_are_valid(self):
+    	if not (testFlag == "-interactive"):
+            print("\n<Test function 'test_paint_board_for_all_markers_and_positions_that_are_valid' is not run on this testing mode.>")
+            return
 
-
-    def test_moves_for_player_two(self):
-        for xPosition in range(180):
-            for yPosition in range(180):
-            	self._board = Board()
-            	newUserMove = UserMove(0, 0)
-            	newUserMove.executeMoveOnBoard(self._board)
-            	newUserMove = UserMove(xPosition, yPosition)
-            	newUserMove.executeMoveOnBoard(self._board)
-                self.assertEqual( self._board._boardGrid[xPosition/60][yPosition/60], 1 )
-                self._board = None
+        print(chr(27) + "[2J") # Just clears terminal screen
+        for xPosition in range(Board.BOARD_SIZE):
+        	for yPosition in range(Board.BOARD_SIZE):
+        		for marker in [0,1,2]:
+        			self._tk_root = tk.Tk()
+        			self._tk_root.title("TEST")
+        			self._tk_root.geometry("180x180")
+        			self._canvas = TicTacCanvas(self._tk_root, width=180, height=180)
+        			self._canvas._paint_board_for_marker_and_position(marker, xPosition, yPosition)
+        			print("<Should see marker colour for marker number: {}>".format(marker))
+        			print("<Should see x position as the marker colour above: {}>".format(xPosition))
+        			print("<Should see y position as the marker colour above: {}>".format(yPosition))
+        			self._tk_root.after(1000, self._doneShowing)
+        			self._tk_root.mainloop()
+        			try:
+        			    self._request_user_confirmation()
+        			except Exception:
+        			    raise Exception
 
     #------------------------------------------------------------------------------------------------------
     # NEGATIVE TESTING
     #------------------------------------------------------------------------------------------------------
-    def test_move_with_no_board(self):
-        for xPosition in range(180):
-            for yPosition in range(180):
-            	newUserMove = UserMove(xPosition, yPosition)
-            	board = None
-            	self.assertRaises(PreconditionError, newUserMove.executeMoveOnBoard, (board))
-"""
+    def test_paint_board_invalid_positions_too_high(self):
+        for boardXPosition in range(Board.BOARD_SIZE):
+            for boardYPosition in range(Board.BOARD_SIZE):
+            	for marker in [0,1,2]:
+                	for invalidPosition in range(3,10):
+        				self._tk_root = tk.Tk()
+        				self._tk_root.title("TEST")
+        				self._tk_root.geometry("180x180")
+        				self._canvas = TicTacCanvas(self._tk_root, width=180, height=180)
+        				self.assertRaises(PreconditionError, self._canvas._paint_board_for_marker_and_position, (marker, invalidPosition, boardYPosition))
+        				self._tk_root.after(25, self._doneShowing)
+        				self._tk_root.mainloop()                	 
+                	for invalidPosition in range(3,10):
+        				self._tk_root = tk.Tk()
+        				self._tk_root.title("TEST")
+        				self._tk_root.geometry("180x180")
+        				self._canvas = TicTacCanvas(self._tk_root, width=180, height=180)
+        				self.assertRaises(PreconditionError, self._canvas._paint_board_for_marker_and_position, (marker, boardXPosition, invalidPosition))
+        				self._tk_root.after(25, self._doneShowing)
+        				self._tk_root.mainloop()
+
+    def test_paint_board_invalid_positions_too_low(self):
+        for boardXPosition in range(Board.BOARD_SIZE):
+            for boardYPosition in range(Board.BOARD_SIZE):
+                for marker in [0,1,2]:	
+                	for invalidPosition in (0, -1, -2, -3, -4, -5, -6, -7):
+        				self._tk_root = tk.Tk()
+        				self._tk_root.title("TEST")
+        				self._tk_root.geometry("180x180")
+        				self._canvas = TicTacCanvas(self._tk_root, width=180, height=180)
+        				self.assertRaises(PreconditionError, self._canvas._paint_board_for_marker_and_position, (marker, invalidPosition, boardYPosition))
+        				self._tk_root.after(25, self._doneShowing)
+        				self._tk_root.mainloop()
+                	for invalidPosition in (0, -1, -2, -3, -4, -5, -6, -7):
+        				self._tk_root = tk.Tk()
+        				self._tk_root.title("TEST")
+        				self._tk_root.geometry("180x180")
+        				self._canvas = TicTacCanvas(self._tk_root, width=180, height=180)
+        				self.assertRaises(PreconditionError, self._canvas._paint_board_for_marker_and_position, (marker, boardXPosition, invalidPosition))
+        				self._tk_root.after(25, self._doneShowing)
+        				self._tk_root.mainloop()
+
+    def test_paint_board_invalid_positions_invalid_type(self):
+        for boardXPosition in range(Board.BOARD_SIZE):
+            for boardYPosition in range(Board.BOARD_SIZE):
+            	for marker in [0,1,2]:	
+                	for invalidPosition in (0.0, -1.134234, "asd", [1, 2], (1, 2)):
+        				self._tk_root = tk.Tk()
+        				self._tk_root.title("TEST")
+        				self._tk_root.geometry("180x180")
+        				self._canvas = TicTacCanvas(self._tk_root, width=180, height=180)
+        				self.assertRaises(PreconditionError, self._canvas._paint_board_for_marker_and_position, (marker, invalidPosition, boardYPosition))
+        				self._tk_root.after(25, self._doneShowing)
+        				self._tk_root.mainloop() 
+                	for invalidPosition in (0.0, -1.134234, "asd", [1, 2], (1, 2)):
+        				self._tk_root = tk.Tk()
+        				self._tk_root.title("TEST")
+        				self._tk_root.geometry("180x180")
+        				self._canvas = TicTacCanvas(self._tk_root, width=180, height=180)
+        				self.assertRaises(PreconditionError, self._canvas._paint_board_for_marker_and_position, (marker, boardXPosition, invalidPosition))
+        				self._tk_root.after(25, self._doneShowing)
+        				self._tk_root.mainloop() 
+
+    def test_paint_board_invalid_marker_too_high(self):
+        for boardXPosition in range(Board.BOARD_SIZE):
+            for boardYPosition in range(Board.BOARD_SIZE):
+            	for marker in range(3,10):
+        			self._tk_root = tk.Tk()
+        			self._tk_root.title("TEST")
+        			self._tk_root.geometry("180x180")
+        			self._canvas = TicTacCanvas(self._tk_root, width=180, height=180)
+        			self.assertRaises(PreconditionError, self._canvas._paint_board_for_marker_and_position, (marker, boardXPosition, boardYPosition))
+        			self._tk_root.after(25, self._doneShowing)
+        			self._tk_root.mainloop() 
+
+    def test_paint_board_invalid_marker_too_low(self):
+        for boardXPosition in range(Board.BOARD_SIZE):
+            for boardYPosition in range(Board.BOARD_SIZE):
+                for marker in (0, -1, -2, -3, -4, -5, -6, -7):	
+        			self._tk_root = tk.Tk()
+        			self._tk_root.title("TEST")
+        			self._tk_root.geometry("180x180")
+        			self._canvas = TicTacCanvas(self._tk_root, width=180, height=180)
+        			self.assertRaises(PreconditionError, self._canvas._paint_board_for_marker_and_position, (marker, boardXPosition, boardYPosition))
+        			self._tk_root.after(25, self._doneShowing)
+        			self._tk_root.mainloop() 
+
+    def test_paint_board_invalid_marker_invalid_type(self):
+        for boardXPosition in range(Board.BOARD_SIZE):
+            for boardYPosition in range(Board.BOARD_SIZE):
+            	for marker in (0.0, -1.134234, "asd", [1, 2], (1, 2)):	
+        			self._tk_root = tk.Tk()
+        			self._tk_root.title("TEST")
+        			self._tk_root.geometry("180x180")
+        			self._canvas = TicTacCanvas(self._tk_root, width=180, height=180)
+        			self.assertRaises(PreconditionError, self._canvas._paint_board_for_marker_and_position, (marker, boardXPosition, boardYPosition))
+        			self._tk_root.after(25, self._doneShowing)
+        			self._tk_root.mainloop() 
+
+class TestGetBoard(unittest.TestCase):
+ 
+    #------------------------------------------------------------------------------------------------------
+    # TESTING SUPPORT CODE
+    #------------------------------------------------------------------------------------------------------
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def _doneShowing(self):
+    	self._tk_root.destroy()
+    	self._tk_root.quit()
+ 
+    #------------------------------------------------------------------------------------------------------
+    # POSITIVE TESTING
+    #------------------------------------------------------------------------------------------------------
+    def test_get_a_board_that_is_new(self):
+        self._tk_root = tk.Tk()
+        self._tk_root.title("TEST")
+        self._tk_root.geometry("180x180")
+        self._canvas = TicTacCanvas(self._tk_root, width=180, height=180)
+        self._board = self._canvas.getBoard()
+        for boardXPosition in range(Board.BOARD_SIZE):
+            for boardYPosition in range(Board.BOARD_SIZE):    
+                self.assertEqual( self._board._boardGrid[boardXPosition][boardYPosition], 0 )
+        self._tk_root.after(10, self._doneShowing)
+        self._tk_root.mainloop()
+
+class TestPaintGameBoardToScreen(unittest.TestCase):
+ 
+    #------------------------------------------------------------------------------------------------------
+    # TESTING SUPPORT CODE
+    #------------------------------------------------------------------------------------------------------
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def _doneShowing(self):
+    	self._tk_root.destroy()
+    	self._tk_root.quit()
+
+    def _request_user_confirmation(self):
+        user_answer = raw_input("Enter <y> if Tic Tac board is as described or <n> if it wasn't:\n")
+        if(user_answer == 'y'):
+            return
+        if(user_answer == 'n'):
+            raise Exception('Test Failed')
+        raise Exception('Incorrect user testing arguement: Test Discounted and Failed')
+
+    #------------------------------------------------------------------------------------------------------
+    # POSITIVE TESTING
+    #------------------------------------------------------------------------------------------------------
+    def test_for_expected_boards(self):
+    	if not (testFlag == "-interactive"):
+            print("\n<Test function 'test_for_expected_boards' is not run on this testing mode.>")
+            return
+
+        # TEST BOARD ONE
+        print(chr(27) + "[2J") # Just clears terminal screen
+        self._tk_root = tk.Tk()
+        self._tk_root.title("TEST")
+        self._tk_root.geometry("180x180")
+        self._canvas = TicTacCanvas(self._tk_root, width=180, height=180)
+        self._board = self._canvas.getBoard()
+        self._board._boardGrid[0][0] = 1
+        self._board._boardGrid[1][1] = 1
+        self._board._boardGrid[2][2] = 1
+        self._canvas.paint_game_board_to_screen()
+        print("< Should see a diagonal white stripe going top left to bottom right >")
+        self._tk_root.after(3000, self._doneShowing)
+        self._tk_root.mainloop()
+        try:
+        	self._request_user_confirmation()
+        except Exception:
+        	raise Exception
+
+        # TEST BOARD TWO
+        print(chr(27) + "[2J") # Just clears terminal screen
+        self._tk_root = tk.Tk()
+        self._tk_root.title("TEST")
+        self._tk_root.geometry("180x180")
+        self._canvas = TicTacCanvas(self._tk_root, width=180, height=180)
+        self._board = self._canvas.getBoard()
+        self._board._boardGrid[0][2] = 1
+        self._board._boardGrid[1][1] = 1
+        self._board._boardGrid[2][0] = 1
+        self._canvas.paint_game_board_to_screen()
+        print("< Should see a diagonal white stripe going bottom left to top right >")
+        self._tk_root.after(3000, self._doneShowing)
+        self._tk_root.mainloop()
+        try:
+        	self._request_user_confirmation()
+        except Exception:
+        	raise Exception
+
 #------------------------------------------------------------------------------------------------------
 # TESTING DRIVER
 #------------------------------------------------------------------------------------------------------
@@ -179,7 +386,7 @@ if __name__ == '__main__':
     testFlag = ((sys.argv[1]) + '.')[:-1]
 
     # Add verbose output for compilation testing
-    if testFlag == "-compilation":
+    if (testFlag == "-compilation") or (testFlag == "-interactove"):
         sys.argv[1] = "-v"
     else:
         del sys.argv[1]
