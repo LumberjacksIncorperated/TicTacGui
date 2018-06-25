@@ -1,0 +1,70 @@
+
+Thoughts on Testing
+-------------------
+
+	1. Testing Code vs Functional Code
+
+	With functional code, we are aiming to reduce duplication to an absoloute minimum within our system, and to make our system as simple
+	as possible. The more complicated a system is, the harder it is to understand it, and make changes to it.
+
+	Testing code is written with different aims in mind, and instead of trying to reduce duplication, we often have quite a bit
+	of duplication, while testing systems may be complex and large.
+
+	2. The Goals Of Testing Code
+
+		2.1 In Terms Of Duplication
+
+		With testing, we want each test case to be as independant as possible. What this means is that we often cannot abstract away from
+		duplicated functionality between different tests. The reason for this, is that with test code, we want to be able to both
+			1/ Move tests around
+			2/ Run tests selectively
+
+		This means that abstracting out duplicated functionality would couple tests to an external depedency, and thwart both these abilities.
+
+		2.2 In Terms Of Coverage
+
+		In a perfect world, tests would cover all the possible flows of execution of a functional system. In reality, it is both:
+			1/ Difficult and time consuming to code such extensive tests
+			2/ Time consuming to RUN such extensive tests
+
+		So it becomes a tradeoff between how often tests should be run and how much coverage they have. If we wanted to run tests often,
+		and only had one level of testing, then we would have to sacrifice test coverage, and we would have LESS confidence our code
+		works as we intended.
+
+		To combat this, we introduce three levels of testing:
+			
+			1/ "Fast"
+				These tests should not have a 100% level of coverage, but should test basic functionality, and should be run the most often
+
+			2/ "Compilation"
+				These tests should be more comprehensive than above, and should contain more feedback on what specific tests pass and
+				what didnt.
+				2.1/ These tests will be slower than the FAST tests
+				2.2/ These tests should be run less often than the FAST tests
+
+			3/ "Interactive"
+				These tests should be AS COMPREHENSIVE AS POSSIBLE, and hence these tests will be the slowest to run. These will naturally
+				end up being run the least often, but can be run when required to give us the maximum amount of confidence that our system
+				works.
+
+		2.3 Different Times For Different Testing
+
+		With the levels introduced above, what we have is three different testing stages that should be run at different times.
+
+		The first level, FAST, should be run whenever any incremental change to the code base is made while refactoring, so that with
+		every change you can gain some confidence that you have not ruined the basic functionality of the system. Since these tests
+		will be run after every small change, if these tests take too long to run, then they will start to drastically affect coding time.
+
+		The second level, COMPILATION, should be run after a coding session, and before a coding session, to ensure that the code base is
+		mostly functional, and hence these can take a meduim time to run, since they will only be run before and after, but not too long
+		to run, otherwise youll never get to the coding part.
+
+		The third and last level, INTERACTIVE, should be run when it is required to give maximum confidence to the project functionality, such
+		as just before a commit to a shared repository, or to production code lines. This can take the longest, since this is to be run
+		in the situations in which we NEED maximum confidence.
+
+
+
+
+
+
