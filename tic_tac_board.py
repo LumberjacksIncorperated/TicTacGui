@@ -16,23 +16,30 @@ testFlag = None
 class Board:
     """ A Tic Tac Toe Board """
 
+    #------------------------------------------------------------------------------------------------------
+    # CONSTANTS
+    #------------------------------------------------------------------------------------------------------
     BOARD_SIZE = 3
-    EMPTY_VALUE = 0
-    PLAYER_TOKEN_VALUE = [1, 2]
-    INITIAL_PLAYER_TURN = 1
+    _MARKER_TOKENS =  {
+        "EMPTY": 0,
+        "PLAYER_ONE": 1,
+        "PLAYER_TWO": 2
+    }
+    _INITIAL_PLAYER_TURN = "PLAYER_TWO"
 
+    #------------------------------------------------------------------------------------------------------
+    # SUPPORT METHODS
+    #------------------------------------------------------------------------------------------------------
     def _create_column_of_empty_value(self):
         column = []
         numberColumnEntriesFilled = 0
         while (numberColumnEntriesFilled < Board.BOARD_SIZE):
-                column += [Board.EMPTY_VALUE]
+                column += [Board._MARKER_TOKENS["EMPTY"]]
                 numberColumnEntriesFilled +=1
         return column
     #END
 
-    def __init__(self):
-        self._playerTurn = Board.INITIAL_PLAYER_TURN
-        self._boardGrid = []
+    def _fill_intial_board_grid(self):
         numberOfBoardRowsCreated = 0
         while (numberOfBoardRowsCreated < Board.BOARD_SIZE):
             newColumn = self._create_column_of_empty_value()
@@ -40,9 +47,25 @@ class Board:
             self._boardGrid += [newColumn]
     #END
 
+    def __init__(self):
+        self._playerTurn = Board._INITIAL_PLAYER_TURN
+        self._boardGrid = []
+        self._fill_intial_board_grid()
+    #END
+
+    def _switch_player_turn(self):
+        if self._playerTurn == "PLAYER_ONE":
+            self._playerTurn = "PLAYER_TWO"
+        else:
+            self._playerTurn = "PLAYER_ONE"
+    #END
+
+    #------------------------------------------------------------------------------------------------------
+    # EXPORTED METHODS
+    #------------------------------------------------------------------------------------------------------
     @preconditions( (lambda self: True),
-                    (lambda boardXPosition: ((isinstance(boardXPosition, int))) and (boardXPosition >= 0) and (boardXPosition < Board.BOARD_SIZE)), 
-                    (lambda boardYPosition: ((isinstance(boardYPosition, int))) and (boardYPosition >= 0) and (boardYPosition < Board.BOARD_SIZE)) ) 
+                    (lambda boardXPosition: ( (isinstance(boardXPosition, int))) and (boardXPosition >= 0) and (boardXPosition < Board.BOARD_SIZE) ), 
+                    (lambda boardYPosition: ( (isinstance(boardYPosition, int))) and (boardYPosition >= 0) and (boardYPosition < Board.BOARD_SIZE) ) ) 
     def placePlayerMarkerOnBoardAtPosition(self, boardXPosition, boardYPosition):
         '''
         DESCRIPTION:
@@ -58,17 +81,13 @@ class Board:
             (invalid arguement)
                 a PreconditionError is thrown
         '''
-        self._boardGrid[boardXPosition][boardYPosition] = Board.PLAYER_TOKEN_VALUE[self._playerTurn]
-        
-        if self._playerTurn == 1:
-            self._playerTurn = 0
-        else:
-            self._playerTurn = 1
+        self._boardGrid[boardXPosition][boardYPosition] = Board._MARKER_TOKENS[self._playerTurn]
+        self._switch_player_turn()
     #END
 
     @preconditions( (lambda self: True),
-                    (lambda boardXPosition: ((isinstance(boardXPosition, int))) and (boardXPosition >= 0) and (boardXPosition < Board.BOARD_SIZE)), 
-                    (lambda boardYPosition: ((isinstance(boardYPosition, int))) and (boardYPosition >= 0) and (boardYPosition < Board.BOARD_SIZE)) ) 
+                    (lambda boardXPosition: ( (isinstance(boardXPosition, int))) and (boardXPosition >= 0) and (boardXPosition < Board.BOARD_SIZE) ), 
+                    (lambda boardYPosition: ( (isinstance(boardYPosition, int))) and (boardYPosition >= 0) and (boardYPosition < Board.BOARD_SIZE) ) ) 
     def getMarkerAtBoardPosition(self, boardXPosition, boardYPosition):
         '''
         DESCRIPTION:
@@ -80,8 +99,10 @@ class Board:
 
         RETURNS:
             (valid arguement) 
-                Integer: Representing the token value, which is an integer defined as Board.EMPTY_VALUE, or
-                         board.PLAYER_TOKEN_VALUE[0], or board.PLAYER_TOKEN_VALUE[1]
+                Integer: Representing the token value
+                    0: Empty position
+                    1: Player one position
+                    2: Player two position
             (invalid arguement)
                 a PreconditionError is thrown
         '''
@@ -138,7 +159,7 @@ class TestCreateColumnWithEmptyMarking(unittest.TestCase):
     def test_column_create_of_correct_entries(self):
         createdColumn = self._board._create_column_of_empty_value()
         for columnIndex in range(Board.BOARD_SIZE):
-            self.assertEqual( createdColumn[columnIndex], Board.EMPTY_VALUE) 
+            self.assertEqual( createdColumn[columnIndex], Board._MARKER_TOKENS["EMPTY"]) 
 
 class TestPlacePlayerMarkerOnBoardAtPosition(unittest.TestCase):
  
@@ -159,10 +180,10 @@ class TestPlacePlayerMarkerOnBoardAtPosition(unittest.TestCase):
     def test_board_intially_empty_marked(self):
         for boardXPosition in range(Board.BOARD_SIZE):
             for boardYPosition in range(Board.BOARD_SIZE):
-                self.assertEqual( self._board._boardGrid[boardXPosition][boardYPosition], Board.EMPTY_VALUE)  
+                self.assertEqual( self._board._boardGrid[boardXPosition][boardYPosition], Board._MARKER_TOKENS["EMPTY"])  
 
     def test_board_alternating_turns(self):
-        playerTurn = Board.INITIAL_PLAYER_TURN
+        playerTurn = Board._MARKER_TOKENS[Board._INITIAL_PLAYER_TURN]
         for boardXPosition in range(Board.BOARD_SIZE):
             for boardYPosition in range(Board.BOARD_SIZE):
                 self._board.placePlayerMarkerOnBoardAtPosition(boardXPosition, boardYPosition)
@@ -230,14 +251,14 @@ class TestGetMarkerOnBoardAtPosition(unittest.TestCase):
     def test_board_intially_empty_marked(self):
         for boardXPosition in range(Board.BOARD_SIZE):
             for boardYPosition in range(Board.BOARD_SIZE):
-                self.assertEqual( self._board.getMarkerAtBoardPosition(boardXPosition,boardYPosition), Board.EMPTY_VALUE)  
+                self.assertEqual( self._board.getMarkerAtBoardPosition(boardXPosition,boardYPosition), Board._MARKER_TOKENS["EMPTY"])  
 
     def test_marking_random_position_player1(self):
         for boardXPosition in range(Board.BOARD_SIZE):
             for boardYPosition in range(Board.BOARD_SIZE):
                 self._board = Board()
-                self._board._boardGrid[boardXPosition][boardYPosition] = Board.PLAYER_TOKEN_VALUE[0]
-                self.assertTrue( self._board.getMarkerAtBoardPosition(boardXPosition,boardYPosition), Board.PLAYER_TOKEN_VALUE[1 - 1] )
+                self._board._boardGrid[boardXPosition][boardYPosition] = Board._MARKER_TOKENS["PLAYER_ONE"]
+                self.assertTrue( self._board.getMarkerAtBoardPosition(boardXPosition,boardYPosition), Board._MARKER_TOKENS["PLAYER_ONE"] )
                 self._board = None
 
 
@@ -245,8 +266,8 @@ class TestGetMarkerOnBoardAtPosition(unittest.TestCase):
         for boardXPosition in range(Board.BOARD_SIZE):
             for boardYPosition in range(Board.BOARD_SIZE):
                 self._board = Board()
-                self._board._boardGrid[boardXPosition][boardYPosition] = Board.PLAYER_TOKEN_VALUE[1]
-                self.assertTrue( self._board.getMarkerAtBoardPosition(boardXPosition,boardYPosition), Board.PLAYER_TOKEN_VALUE[2 - 1] )
+                self._board._boardGrid[boardXPosition][boardYPosition] = Board._MARKER_TOKENS["PLAYER_TWO"]
+                self.assertTrue( self._board.getMarkerAtBoardPosition(boardXPosition,boardYPosition), Board._MARKER_TOKENS["PLAYER_TWO"] )
                 self._board = None
 
     #------------------------------------------------------------------------------------------------------

@@ -72,6 +72,7 @@ def preconditions(*preconditions):
     '''
     _check_preconditions_are_all_lambda_expressions(preconditions)
     return _wrap_function_in_precondition_decorator(preconditions)
+#END
 
 #------------------------------------------------------------------------------------------------------
 # TESTING IMPLEMENTATION
