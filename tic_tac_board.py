@@ -64,8 +64,8 @@ class Board:
     # EXPORTED METHODS
     #------------------------------------------------------------------------------------------------------
     @preconditions( (lambda self: True),
-                    (lambda boardXPosition: ( (isinstance(boardXPosition, int))) and (boardXPosition >= 0) and (boardXPosition < Board.BOARD_SIZE) ), 
-                    (lambda boardYPosition: ( (isinstance(boardYPosition, int))) and (boardYPosition >= 0) and (boardYPosition < Board.BOARD_SIZE) ) ) 
+                    (lambda boardXPosition: ( (isinstance(boardXPosition, int))) and (boardXPosition >= 0) and (boardXPosition < Board.BOARD_SIZE) ),
+                    (lambda boardYPosition: ( (isinstance(boardYPosition, int))) and (boardYPosition >= 0) and (boardYPosition < Board.BOARD_SIZE) ) )
     def placePlayerMarkerOnBoardAtPosition(self, boardXPosition, boardYPosition):
         '''
         DESCRIPTION:
@@ -76,7 +76,7 @@ class Board:
             boardYPosition: a board coordinate in the y direction between 0 and 2 as an integer
 
         RETURNS:
-            (valid arguement) 
+            (valid arguement)
                 None
             (invalid arguement)
                 a PreconditionError is thrown
@@ -86,8 +86,8 @@ class Board:
     #END
 
     @preconditions( (lambda self: True),
-                    (lambda boardXPosition: ( (isinstance(boardXPosition, int))) and (boardXPosition >= 0) and (boardXPosition < Board.BOARD_SIZE) ), 
-                    (lambda boardYPosition: ( (isinstance(boardYPosition, int))) and (boardYPosition >= 0) and (boardYPosition < Board.BOARD_SIZE) ) ) 
+                    (lambda boardXPosition: ( (isinstance(boardXPosition, int))) and (boardXPosition >= 0) and (boardXPosition < Board.BOARD_SIZE) ),
+                    (lambda boardYPosition: ( (isinstance(boardYPosition, int))) and (boardYPosition >= 0) and (boardYPosition < Board.BOARD_SIZE) ) )
     def getMarkerAtBoardPosition(self, boardXPosition, boardYPosition):
         '''
         DESCRIPTION:
@@ -98,7 +98,7 @@ class Board:
             boardYPosition: a board coordinate in the y direction between 0 and 2 as an integer
 
         RETURNS:
-            (valid arguement) 
+            (valid arguement)
                 Integer: Representing the token value
                     0: Empty position
                     1: Player one position
@@ -125,7 +125,7 @@ class TestConstructor(unittest.TestCase):
         self._board = Board()
 
     def tearDown(self):
-    	self._board = None
+        self._board = None
  
     #------------------------------------------------------------------------------------------------------
     # POSITIVE TESTING
@@ -133,11 +133,11 @@ class TestConstructor(unittest.TestCase):
     def test_construction(self):
         for boardXPosition in range(Board.BOARD_SIZE):
             for boardYPosition in range(Board.BOARD_SIZE):
-                self.assertEqual( self._board._boardGrid[boardXPosition][boardYPosition], 
-                                  self._known_initial_board_value[boardXPosition][boardYPosition])  
+                self.assertEqual( self._board._boardGrid[boardXPosition][boardYPosition],
+                                  self._known_initial_board_value[boardXPosition][boardYPosition] )
 
 class TestCreateColumnWithEmptyMarking(unittest.TestCase):
- 
+    
     #------------------------------------------------------------------------------------------------------
     # TESTING SUPPORT CODE
     #------------------------------------------------------------------------------------------------------
@@ -154,15 +154,15 @@ class TestCreateColumnWithEmptyMarking(unittest.TestCase):
     #------------------------------------------------------------------------------------------------------
     def test_column_create_of_correct_length(self):
         createdColumn = self._board._create_column_of_empty_value()
-        self.assertEqual( len(createdColumn), 3) 
+        self.assertEqual( len(createdColumn), 3)
 
     def test_column_create_of_correct_entries(self):
         createdColumn = self._board._create_column_of_empty_value()
         for columnIndex in range(Board.BOARD_SIZE):
-            self.assertEqual( createdColumn[columnIndex], Board._MARKER_TOKENS["EMPTY"]) 
+            self.assertEqual( createdColumn[columnIndex], Board._MARKER_TOKENS["EMPTY"])
 
 class TestPlacePlayerMarkerOnBoardAtPosition(unittest.TestCase):
- 
+
     #------------------------------------------------------------------------------------------------------
     # TESTING SUPPORT CODE
     #------------------------------------------------------------------------------------------------------
@@ -180,7 +180,7 @@ class TestPlacePlayerMarkerOnBoardAtPosition(unittest.TestCase):
     def test_board_intially_empty_marked(self):
         for boardXPosition in range(Board.BOARD_SIZE):
             for boardYPosition in range(Board.BOARD_SIZE):
-                self.assertEqual( self._board._boardGrid[boardXPosition][boardYPosition], Board._MARKER_TOKENS["EMPTY"])  
+                self.assertEqual( self._board._boardGrid[boardXPosition][boardYPosition], Board._MARKER_TOKENS["EMPTY"])
 
     def test_board_alternating_turns(self):
         playerTurn = Board._MARKER_TOKENS[Board._INITIAL_PLAYER_TURN]
@@ -202,11 +202,11 @@ class TestPlacePlayerMarkerOnBoardAtPosition(unittest.TestCase):
                 for invalidPosition in range(3,100):
                     self._board = Board()
                     self.assertRaises( PreconditionError, self._board.placePlayerMarkerOnBoardAtPosition, (invalidPosition, boardYPosition) )
-                    self._board = None 
+                    self._board = None
                 for invalidPosition in range(3,100):
                     self._board = Board()
                     self.assertRaises( PreconditionError, self._board.placePlayerMarkerOnBoardAtPosition, (boardXPosition, invalidPosition) )
-                    self._board = None 
+                    self._board = None
 
     def test_marking_invalid_positions_too_low(self):
         for boardXPosition in range(Board.BOARD_SIZE):
@@ -218,7 +218,7 @@ class TestPlacePlayerMarkerOnBoardAtPosition(unittest.TestCase):
                 for invalidPosition in (0, -1, -2, -3, -4, -5, -6, -7):
                     self._board = Board()
                     self.assertRaises( PreconditionError, self._board.placePlayerMarkerOnBoardAtPosition, (invalidPosition, boardYPosition) )
-                    self._board = None 
+                    self._board = None
 
     def test_marking_invalid_positions_invalid_type(self):
         for boardXPosition in range(Board.BOARD_SIZE):
@@ -230,10 +230,10 @@ class TestPlacePlayerMarkerOnBoardAtPosition(unittest.TestCase):
                 for invalidPosition in (0.0, -1.134234, "asd", [1, 2], (1, 2)):
                     self._board = Board()
                     self.assertRaises( PreconditionError, self._board.placePlayerMarkerOnBoardAtPosition, (invalidPosition, boardYPosition) )
-                    self._board = None 
+                    self._board = None
 
 class TestGetMarkerOnBoardAtPosition(unittest.TestCase):
- 
+
     #------------------------------------------------------------------------------------------------------
     # TESTING SUPPORT CODE
     #------------------------------------------------------------------------------------------------------
@@ -251,7 +251,7 @@ class TestGetMarkerOnBoardAtPosition(unittest.TestCase):
     def test_board_intially_empty_marked(self):
         for boardXPosition in range(Board.BOARD_SIZE):
             for boardYPosition in range(Board.BOARD_SIZE):
-                self.assertEqual( self._board.getMarkerAtBoardPosition(boardXPosition,boardYPosition), Board._MARKER_TOKENS["EMPTY"])  
+                self.assertEqual( self._board.getMarkerAtBoardPosition(boardXPosition,boardYPosition), Board._MARKER_TOKENS["EMPTY"] )
 
     def test_marking_random_position_player1(self):
         for boardXPosition in range(Board.BOARD_SIZE):
@@ -279,11 +279,11 @@ class TestGetMarkerOnBoardAtPosition(unittest.TestCase):
                 for invalidPosition in range(3,100):
                     self._board = Board()
                     self.assertRaises( PreconditionError, self._board.getMarkerAtBoardPosition, (invalidPosition, boardYPosition) )
-                    self._board = None 
+                    self._board = None
                 for player in range(3,100):
                     self._board = Board()
                     self.assertRaises( PreconditionError, self._board.getMarkerAtBoardPosition, (boardXPosition, invalidPosition) )
-                    self._board = None 
+                    self._board = None
 
     def test_marking_invalid_positions_too_low(self):
         for boardXPosition in range(Board.BOARD_SIZE):
@@ -295,7 +295,7 @@ class TestGetMarkerOnBoardAtPosition(unittest.TestCase):
                 for invalidPosition in (0, -1, -2, -3, -4, -5, -6, -7):
                     self._board = Board()
                     self.assertRaises( PreconditionError, self._board.getMarkerAtBoardPosition, (invalidPosition, boardYPosition) )
-                    self._board = None 
+                    self._board = None
 
     def test_marking_invalid_positions_invalid_type(self):
         for boardXPosition in range(Board.BOARD_SIZE):
@@ -307,7 +307,7 @@ class TestGetMarkerOnBoardAtPosition(unittest.TestCase):
                 for invalidPosition in (0.0, -1.134234, "asd", [1, 2], (1, 2)):
                     self._board = Board()
                     self.assertRaises( PreconditionError, self._board.getMarkerAtBoardPosition, (invalidPosition, boardYPosition) )
-                    self._board = None 
+                    self._board = None
 
 #------------------------------------------------------------------------------------------------------
 # TESTING DRIVER

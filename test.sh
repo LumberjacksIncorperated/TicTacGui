@@ -94,6 +94,7 @@ function slowTestModule()
 function cleanupTestFiles()
 {
     rm testResult.txt
+    rm *.pyc
 }
 
 #----------------------------------------------------------------------------------------------------------------------

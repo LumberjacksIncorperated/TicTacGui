@@ -78,7 +78,7 @@ def preconditions(*preconditions):
 # TESTING IMPLEMENTATION
 #------------------------------------------------------------------------------------------------------
 class TestPrecondition(unittest.TestCase):
- 
+
     #------------------------------------------------------------------------------------------------------
     # TESTING SUPPORT CODE
     #------------------------------------------------------------------------------------------------------
@@ -104,14 +104,14 @@ class TestPrecondition(unittest.TestCase):
     #------------------------------------------------------------------------------------------------------
     def test_known_valid_preconditions(self):
         for testFunction, testFunctionArguements in self.testFunctionPositiveApplicationList:
-            self.assertTrue(testFunction(*testFunctionArguements))  
+            self.assertTrue(testFunction(*testFunctionArguements))
 
     #------------------------------------------------------------------------------------------------------
     # NEGATIVE TESTING
     #------------------------------------------------------------------------------------------------------
     def test_known_invalid_precondition_arguements(self):
         for testFunction, testFunctionArguements in self.testFunctionNegativeApplicationList:
-            self.assertRaises(PreconditionError, testFunction, *testFunctionArguements) 
+            self.assertRaises(PreconditionError, testFunction, *testFunctionArguements)
 
 #------------------------------------------------------------------------------------------------------
 # TESTING DRIVER

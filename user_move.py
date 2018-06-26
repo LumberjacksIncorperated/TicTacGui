@@ -26,8 +26,8 @@ class UserMove:
     # EXPORTED METHODS
     #------------------------------------------------------------------------------------------------------
     @preconditions( (lambda self: True),
-                    (lambda boardXPosition: ( (isinstance(boardXPosition, int))) and (boardXPosition >= 0) and (boardXPosition < UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS) ), 
-                    (lambda boardYPosition: ( (isinstance(boardYPosition, int))) and (boardYPosition >= 0) and (boardYPosition < UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS) ) ) 
+                    (lambda boardXPosition: ( (isinstance(boardXPosition, int))) and (boardXPosition >= 0) and (boardXPosition < UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS) ),
+                    (lambda boardYPosition: ( (isinstance(boardYPosition, int))) and (boardYPosition >= 0) and (boardYPosition < UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS) ) )
     def __init__(self, xPosition, yPosition):
         '''
         DESCRIPTION:
@@ -38,17 +38,17 @@ class UserMove:
             yPosition: a board coordinate in the y direction between 0 and 180 as an integer
 
         RETURNS:
-            (valid arguement) 
+            (valid arguement)
                 The User Move Object
             (invalid arguement)
                 a PreconditionError is thrown
         '''
         self._xPosition = xPosition * UserMove._BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION
         self._yPosition = yPosition * UserMove._BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION
-	#END
+    #END
 
     @preconditions( (lambda self: True),
-                    (lambda board: (board is not None) ) ) 
+                    (lambda board: (board is not None) ) )
     def executeMoveOnBoard(self, board):
         '''
         DESCRIPTION:
@@ -58,19 +58,19 @@ class UserMove:
             board: The board the player marker will be placed on
 
         RETURNS:
-            (valid arguement) 
+            (valid arguement)
                 None
             (invalid arguement)
                 a PreconditionError is thrown
         '''
         board.placePlayerMarkerOnBoardAtPosition(self._xPosition, self._yPosition)
-	#END
+    #END
 
 #------------------------------------------------------------------------------------------------------
 # TESTING IMPLEMENTATION
 #------------------------------------------------------------------------------------------------------
 class TestConstructor(unittest.TestCase):
- 
+
     #------------------------------------------------------------------------------------------------------
     # TESTING SUPPORT CODE
     #------------------------------------------------------------------------------------------------------
@@ -129,7 +129,7 @@ class TestConstructor(unittest.TestCase):
             	self.assertRaises( PreconditionError, UserMove, (xPosition, yPosition))
 
 class TestExecuteMoveOnBoard(unittest.TestCase):
- 
+
     #------------------------------------------------------------------------------------------------------
     # TESTING SUPPORT CODE
     #------------------------------------------------------------------------------------------------------
@@ -145,12 +145,12 @@ class TestExecuteMoveOnBoard(unittest.TestCase):
     def test_moves_for_player_one(self):
         for xPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
             for yPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
-            	self._board = Board()
-            	newUserMove = UserMove(xPosition, yPosition)
-            	newUserMove.executeMoveOnBoard(self._board)
+                self._board = Board()
+                newUserMove = UserMove(xPosition, yPosition)
+                newUserMove.executeMoveOnBoard(self._board)
                 xPositionInTermsOfIndex = xPosition * UserMove._BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION
-            	yPositionInTermsOfIndex = yPosition * UserMove._BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION
-            	markerAtCurrentPosition = self._board._boardGrid[xPositionInTermsOfIndex][yPositionInTermsOfIndex]
+                yPositionInTermsOfIndex = yPosition * UserMove._BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION
+                markerAtCurrentPosition = self._board._boardGrid[xPositionInTermsOfIndex][yPositionInTermsOfIndex]
                 self.assertEqual( markerAtCurrentPosition, 2 )
                 self._board = None
 
@@ -158,14 +158,14 @@ class TestExecuteMoveOnBoard(unittest.TestCase):
     def test_moves_for_player_two(self):
         for xPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
             for yPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
-            	self._board = Board()
-            	newUserMove = UserMove(0, 0)
-            	newUserMove.executeMoveOnBoard(self._board)
-            	newUserMove = UserMove(xPosition, yPosition)
-            	newUserMove.executeMoveOnBoard(self._board)
-            	xPositionInTermsOfIndex = xPosition * UserMove._BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION
-            	yPositionInTermsOfIndex = yPosition * UserMove._BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION
-            	markerAtCurrentPosition = self._board._boardGrid[xPositionInTermsOfIndex][yPositionInTermsOfIndex]
+                self._board = Board()
+                newUserMove = UserMove(0, 0)
+                newUserMove.executeMoveOnBoard(self._board)
+                newUserMove = UserMove(xPosition, yPosition)
+                newUserMove.executeMoveOnBoard(self._board)
+                xPositionInTermsOfIndex = xPosition * UserMove._BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION
+                yPositionInTermsOfIndex = yPosition * UserMove._BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION
+                markerAtCurrentPosition = self._board._boardGrid[xPositionInTermsOfIndex][yPositionInTermsOfIndex]
                 self.assertEqual( markerAtCurrentPosition, 1 )
                 self._board = None
 
@@ -175,9 +175,9 @@ class TestExecuteMoveOnBoard(unittest.TestCase):
     def test_move_with_no_board(self):
         for xPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
             for yPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
-            	newUserMove = UserMove(xPosition, yPosition)
-            	board = None
-            	self.assertRaises(PreconditionError, newUserMove.executeMoveOnBoard, (board))
+                newUserMove = UserMove(xPosition, yPosition)
+                board = None
+                self.assertRaises(PreconditionError, newUserMove.executeMoveOnBoard, (board))
 
 #------------------------------------------------------------------------------------------------------
 # TESTING DRIVER
