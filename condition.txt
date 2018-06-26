@@ -1,0 +1,72 @@
+
+Design Decisions For Conditions
+-------------------------------
+
+	1. Module Sections
+
+	Originally, the module was only seperated into four sections
+	1/ IMPORTS
+	2/ IMPLEMENTATION
+	3/ TESTING
+	4/ TESTING DRIVER
+
+	The reasons we keep these sections seperate and in immediately identifiable sections of the document is that we want to
+	be able to locate the 4 sections almost immediately as the first task when we open the document, as generally we will
+	want to perform modifications on only one of these sections at a time (if we are sticking to incremental coding), and
+	as such the first and easiest task should first be locating these seperate sections within a document
+
+	The testing driver is used for code involving command line options and what is executed from the testing harness. This
+	is not about changing the tests, but changing the testing options and what tests are run when.
+
+	The testing code is about testing the correctness and robustness of the code we have 'implemented'.
+		1. Correctness:
+			This means ensuring our code does what it says it will do
+		2. Robustness:
+			This means ensuring our code fails in a certain way
+
+	Implementation code is the code we have implemented (straightforward)
+
+	And imports is a section to explain what code we have brought in. I actually think this is one of the most underrated
+	sections of all time. Whenever we bring in code to our module, we are taking code that is not tested within our module.
+	Hence, we cannot make statements about the robustness or correctness of this code. We need to be aware of what code
+	is imported and from an external source, but extra attention will need to placed on this code.
+
+	I have since decided to add two new sections:
+		5/ Auxillary Classes
+		6/ Support Functions
+
+	The reason for the addition of 'auxillary classes' is for classes that offer support to the module. Modules should as
+	a rule only contain one class, as each class should by definition as a module belong to a seperate file, but there
+	are some exceptions, such as implemented error classes. Exceptions such as these should be placed in this section,
+	so they can both be found quickly and do not clutter the code.
+
+	The reason for addition of the 'support functions' is that I found when I implemented a module, there can be alot of both
+	external exported functions and internal private functions mixed in together. This clutters the code and makes it more
+	difficult and slow to just locate the exported functions.
+
+	2. Decorator Implementations
+
+    For decorator functions, we have a general rule that we do not include the actual wrapping code in the function itself,
+    but in a support function. This is so that the wrapped code exists standalone in a seperate function, and can be read
+    simply and without clutter.
+
+    Example:
+
+        def _wrap_function_in_precondition_decorator(preconditions):
+       		def decorator(function):
+        		def function_wrapper(*args):
+            		return _wrap_function_in_precondition_check_with_preconditions_and_args(function, preconditions, args)
+        		return function_wrapper
+    		return decorator
+
+    3. Testing Driver Comments
+
+    I have decided to include comments no where else but the testing driver. This is because the testing driver is mostly
+    about meta decisions, and usually contains alot of not very easy to read arguement parsing.
+
+    We could seperate out the testing driver into different functions, but i believe in keeping the testing driver simple,
+    and as a script, instead of having it as a third section of functions.
+
+    *Unlike the testing code and implementation code, there should be a limit to the modules testing driver's complexity,
+    otherwise you are probably doing something wrong
+
