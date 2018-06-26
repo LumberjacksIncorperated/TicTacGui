@@ -4,7 +4,6 @@
 import unittest
 from conditions import preconditions, PreconditionError
 import sys
-import Tkinter as tk
 from tic_tac_board import Board
 
 #------------------------------------------------------------------------------------------------------
@@ -17,11 +16,18 @@ testFlag = None
 #------------------------------------------------------------------------------------------------------
 class UserMove:
 
-    CONSTANT = 60
+    #------------------------------------------------------------------------------------------------------
+    # CONSTANTS
+    #------------------------------------------------------------------------------------------------------
+    _BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION = 1/60
+    _MAX_POSITION_IN_RESPECT_TO_PIXELS = 180
 
+    #------------------------------------------------------------------------------------------------------
+    # EXPORTED METHODS
+    #------------------------------------------------------------------------------------------------------
     @preconditions( (lambda self: True),
-                    (lambda boardXPosition: ((isinstance(boardXPosition, int))) and (boardXPosition >= 0) and (boardXPosition < 180)), 
-                    (lambda boardYPosition: ((isinstance(boardYPosition, int))) and (boardYPosition >= 0) and (boardYPosition < 180)) ) 
+                    (lambda boardXPosition: ( (isinstance(boardXPosition, int))) and (boardXPosition >= 0) and (boardXPosition < UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS) ), 
+                    (lambda boardYPosition: ( (isinstance(boardYPosition, int))) and (boardYPosition >= 0) and (boardYPosition < UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS) ) ) 
     def __init__(self, xPosition, yPosition):
         '''
         DESCRIPTION:
@@ -37,8 +43,8 @@ class UserMove:
             (invalid arguement)
                 a PreconditionError is thrown
         '''
-        self._xPosition = xPosition / UserMove.CONSTANT
-        self._yPosition = yPosition / UserMove.CONSTANT
+        self._xPosition = xPosition * UserMove._BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION
+        self._yPosition = yPosition * UserMove._BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION
 	#END
 
     @preconditions( (lambda self: True),
@@ -78,47 +84,47 @@ class TestConstructor(unittest.TestCase):
     # POSITIVE TESTING
     #------------------------------------------------------------------------------------------------------
     def test_construction_for_corrext_x_position_value(self):
-        for xPosition in range(180):
-            for yPosition in range(180):
+        for xPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
+            for yPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
             	newUserMove = UserMove(xPosition, yPosition)
-                self.assertEqual( newUserMove._xPosition, xPosition / 60 )
+                self.assertEqual( newUserMove._xPosition, xPosition * UserMove._BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION )
 
     def test_construction_for_corrext_y_position_value(self):
-        for xPosition in range(180):
-            for yPosition in range(180):
+        for xPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
+            for yPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
             	newUserMove = UserMove(xPosition, yPosition)
-                self.assertEqual( newUserMove._yPosition, yPosition / 60 )
+                self.assertEqual( newUserMove._yPosition, yPosition * UserMove._BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION )
 
     #------------------------------------------------------------------------------------------------------
     # NEGATIVE TESTING
     #------------------------------------------------------------------------------------------------------
     def test_construction_for_x_position_value_too_high(self):
-        for xPosition in range(180,300):
-            for yPosition in range(180):
+        for xPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS,UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS*2):
+            for yPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
                 self.assertRaises( PreconditionError, UserMove, (xPosition, yPosition))
 
     def test_construction_for_y_position_value_too_high(self):
-        for xPosition in range(180):
-            for yPosition in range(180,300):
+        for xPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
+            for yPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS,UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS*2):
             	self.assertRaises( PreconditionError, UserMove, (xPosition, yPosition))
 
     def test_construction_for_x_position_value_too_low(self):
-        for xPosition in range(-180,0):
-            for yPosition in range(180):
+        for xPosition in range(-UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS,0):
+            for yPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
                 self.assertRaises( PreconditionError, UserMove, (xPosition, yPosition))
 
     def test_construction_for_y_position_value_too_low(self):
-        for xPosition in range(180):
-            for yPosition in range(-180,0):
+        for xPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
+            for yPosition in range(-UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS,0):
             	self.assertRaises( PreconditionError, UserMove, (xPosition, yPosition))
 
     def test_construction_for_x_position_invalid_type(self):
         for xPosition in ['asd', (), [], 1.2]:
-            for yPosition in range(180):
+            for yPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
                 self.assertRaises( PreconditionError, UserMove, (xPosition, yPosition))
 
     def test_construction_for_y_position_value_invalid_type(self):
-        for xPosition in range(180):
+        for xPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
             for yPosition in ['asd', (), [], 1.2]:
             	self.assertRaises( PreconditionError, UserMove, (xPosition, yPosition))
 
@@ -137,32 +143,38 @@ class TestExecuteMoveOnBoard(unittest.TestCase):
     # POSITIVE TESTING
     #------------------------------------------------------------------------------------------------------
     def test_moves_for_player_one(self):
-        for xPosition in range(180):
-            for yPosition in range(180):
+        for xPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
+            for yPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
             	self._board = Board()
             	newUserMove = UserMove(xPosition, yPosition)
             	newUserMove.executeMoveOnBoard(self._board)
-                self.assertEqual( self._board._boardGrid[xPosition/60][yPosition/60], 2 )
+                xPositionInTermsOfIndex = xPosition * UserMove._BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION
+            	yPositionInTermsOfIndex = yPosition * UserMove._BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION
+            	markerAtCurrentPosition = self._board._boardGrid[xPositionInTermsOfIndex][yPositionInTermsOfIndex]
+                self.assertEqual( markerAtCurrentPosition, 2 )
                 self._board = None
 
 
     def test_moves_for_player_two(self):
-        for xPosition in range(180):
-            for yPosition in range(180):
+        for xPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
+            for yPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
             	self._board = Board()
             	newUserMove = UserMove(0, 0)
             	newUserMove.executeMoveOnBoard(self._board)
             	newUserMove = UserMove(xPosition, yPosition)
             	newUserMove.executeMoveOnBoard(self._board)
-                self.assertEqual( self._board._boardGrid[xPosition/60][yPosition/60], 1 )
+            	xPositionInTermsOfIndex = xPosition * UserMove._BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION
+            	yPositionInTermsOfIndex = yPosition * UserMove._BOARD_INDEX_TO_PIXEL_NUMBER_CONVERSION
+            	markerAtCurrentPosition = self._board._boardGrid[xPositionInTermsOfIndex][yPositionInTermsOfIndex]
+                self.assertEqual( markerAtCurrentPosition, 1 )
                 self._board = None
 
     #------------------------------------------------------------------------------------------------------
     # NEGATIVE TESTING
     #------------------------------------------------------------------------------------------------------
     def test_move_with_no_board(self):
-        for xPosition in range(180):
-            for yPosition in range(180):
+        for xPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
+            for yPosition in range(UserMove._MAX_POSITION_IN_RESPECT_TO_PIXELS):
             	newUserMove = UserMove(xPosition, yPosition)
             	board = None
             	self.assertRaises(PreconditionError, newUserMove.executeMoveOnBoard, (board))
@@ -186,7 +198,7 @@ if __name__ == '__main__':
     testFlag = ((sys.argv[1]) + '.')[:-1]
 
     # Add verbose output for compilation testing
-    if testFlag == "-compilation":
+    if (testFlag == "-compilation") or (testFlag == "-interactive"):
         sys.argv[1] = "-v"
     else:
         del sys.argv[1]

@@ -132,7 +132,7 @@ if __name__ == '__main__':
     testFlag = ((sys.argv[1]) + '.')[:-1]
 
     # Add verbose output for compilation testing
-    if testFlag == "-compilation":
+    if (testFlag == "-compilation") or (testFlag == "-interactive"):
         sys.argv[1] = "-v"
     else:
         del sys.argv[1]
